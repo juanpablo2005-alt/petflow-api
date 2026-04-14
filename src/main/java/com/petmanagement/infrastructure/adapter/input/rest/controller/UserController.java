@@ -1,5 +1,7 @@
 package com.petmanagement.infrastructure.adapter.input.rest.controller;
 
+import com.petmanagement.infrastructure.adapter.input.rest.dto.request.LoginRequest;
+import com.petmanagement.infrastructure.config.JwtService;
 import com.petmanagement.application.port.input.UserUseCase;
 import com.petmanagement.domain.model.User;
 import com.petmanagement.infrastructure.adapter.input.rest.dto.request.RegisterUserRequest;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ import reactor.core.publisher.Mono;
 public class UserController {
 
     private final UserUseCase userUseCase;
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
@@ -31,6 +35,16 @@ public class UserController {
                 .password(req.getPassword()).phone(req.getPhone())
                 .build();
         return userUseCase.register(user).map(u -> ApiResponse.ok("Usuario registrado", toResponse(u)));
+    }
+
+    @PostMapping("/login")
+    @Operation(summary = "Iniciar sesión y generar token")
+    public Mono<ApiResponse<String>> login(@RequestBody LoginRequest request) {
+        return userUseCase.login(request.getEmail(), request.getPassword())
+                .map(user -> {
+                    String token = jwtService.generateToken(user.getEmail());
+                    return ApiResponse.ok("Login exitoso", token);
+                });
     }
 
     @GetMapping("/{id}")

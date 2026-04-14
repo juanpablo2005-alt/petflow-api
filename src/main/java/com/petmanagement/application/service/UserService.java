@@ -58,4 +58,16 @@ public class UserService implements UserUseCase {
                     return userRepositoryPort.save(user);
                 }).then();
     }
+
+    @Override
+    public Mono<User> login(String email, String password) {
+        return userRepositoryPort.findByEmail(email)
+                .switchIfEmpty(Mono.error(new UserNotFoundException(email)))
+                .flatMap(user -> {
+                    if (!user.getPassword().equals(password)) {
+                        return Mono.error(new RuntimeException("Credenciales inválidas"));
+                    }
+                    return Mono.just(user);
+                });
+    }
 }
