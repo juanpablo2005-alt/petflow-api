@@ -11,4 +11,5 @@ public interface PetRepositoryPort {
     Flux<Pet> findByUserId(String userId);
     Flux<Pet> findByCategoryId(String categoryId);
     Mono<Void> deleteById(String id);
+    Flux<Pet> findByStatus(Pet.PetStatus status);
 }

@@ -4,9 +4,12 @@ import com.petmanagement.domain.model.MedicalRecord;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+
 public interface MedicalRecordRepositoryPort {
     Mono<MedicalRecord> save(MedicalRecord record);
     Flux<MedicalRecord> findByPetId(String petId);
     Mono<MedicalRecord> findById(String id);
     Mono<Void> deleteById(String id);
+    Flux<MedicalRecord> findByPetIdAndConsultationDateAfter(String petId, LocalDate date);
 }
